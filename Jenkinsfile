@@ -32,12 +32,15 @@ pipeline {
         }
         stage('Deploy to minikube'){
             steps{
-                script{
-                    sh '''
-                    kubectl apply -f deployment.yaml
-                    kubectl apply -f service.yaml
-                    kubectl rollout status deployment/hello-app
-                    '''
+                withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_FILE')]){
+                    script{
+                        sh '''
+                            env.KUBECONFIG = "${KUBECONFIG_FILE}"
+                            kubectl apply -f deployment.yaml
+                            kubectl apply -f service.yaml
+                            kubectl rollout status deployment/hello-app
+                        '''
+                    }
                 }
             }
         }
