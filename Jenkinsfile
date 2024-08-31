@@ -3,6 +3,9 @@ pipeline {
     tools{
         maven 'm3'
     }
+    environment {
+        KUBECONFIG = credentials('kubeconfig') // Refer to the credential ID
+    }
     stages{
         stage('Build Maven'){
             steps{
@@ -32,15 +35,13 @@ pipeline {
         }
         stage('Deploy to minikube'){
             steps{
-                withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_FILE')]){
-                    script{
-                        sh '''
-                            
-                            kubectl apply -f deployment.yaml
-                            kubectl apply -f service.yaml
-                            kubectl rollout status deployment/hello-app
-                        '''
-                    }
+                script{
+                    sh '''
+                        kubectl config current-context
+                        kubectl apply -f deployment.yaml
+                        kubectl apply -f service.yaml
+                        kubectl rollout status deployment/hello-app
+                    '''
                 }
             }
         }
