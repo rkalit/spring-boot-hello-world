@@ -1,9 +1,5 @@
 pipeline {
-    agent {
-        node {
-            label 'agent-local'
-        }
-    }
+    agent any
     tools{
         maven 'm3'
     }
